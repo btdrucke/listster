@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1038605231587",
+    "firebase_url": "https://listster-e9d11.firebaseio.com",
+    "project_id": "listster-e9d11",
+    "storage_bucket": "listster-e9d11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038605231587:android:0bf08a933f8194e6",
+        "android_client_info": {
+          "package_name": "com.whizbang.listster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1038605231587-kaisrcq03tsr7u2k2988p67cl208oddl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.whizbang.listster",
+            "certificate_hash": "22655C0DB38255DC37CF150F83DA05AF840F2325"
+          }
+        },
+        {
+          "client_id": "1038605231587-3nbfvim8rgag4nko96kfo4pkrr26st3a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9gLxJe8-xs25x_CBJoSax9LIMQxx6EzY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1038605231587-3nbfvim8rgag4nko96kfo4pkrr26st3a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
