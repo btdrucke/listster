@@ -9,4 +9,5 @@
     <string name="sign_out">Sign Out</string>
     <string name="disconnect">Disconnect</string>
     <string name="label_google_sign_in">Firebase + Google Sign In</string>
+    <string name="users_lists">%s\'s Lists</string>
 </resources>
