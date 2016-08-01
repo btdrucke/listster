@@ -32,6 +32,10 @@ android {
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'META-INF/NOTICE'
     }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 
@@ -40,6 +44,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.firebase:firebase-client-android:2.5.2+'
+    compile 'com.android.support:design:23.4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
