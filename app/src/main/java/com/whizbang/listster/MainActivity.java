@@ -29,7 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.whizbang.listster.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean mToolbarCollapsed = true;
     private ActivityMainBinding mBinding;
     private ListItemAdapter mAdapter;
-    private List<String> mUserListRefs;
-    private List<UserList> mUserLists;
+    private HashMap<String, String> mUserListRefs;
+    private HashMap<String, UserList> mUserLists;
 
 
     @Override
@@ -152,13 +152,12 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.onCancelled(error);
                 }
             });
-
         }
     }
 
 
     private void onUsersChange(DataSnapshot dataSnapshot) {
-        GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {
+        GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
         };
         mUserListRefs = dataSnapshot.getValue(t);
         if (mUserLists != null) {
@@ -168,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void onListsChange(DataSnapshot dataSnapshot) {
-        GenericTypeIndicator<List<UserList>> t = new GenericTypeIndicator<List<UserList>>() {
+        GenericTypeIndicator<HashMap<String, UserList>> t = new GenericTypeIndicator<HashMap<String, UserList>>() {
         };
         mUserLists = dataSnapshot.getValue(t);
         if (mUserListRefs != null) {
@@ -184,7 +183,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateUi() {
-
+        for(String listRef : mUserListRefs.values()) {
+            UserList userList = mUserLists.get(listRef);
+            Log.d(TAG, "Got list: " + userList);
+        }
     }
 
 

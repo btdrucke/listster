@@ -20,4 +20,12 @@ public class UserList {
     public String getTitle() {
         return mTitle;
     }
+
+
+    @Override
+    public String toString() {
+        return "UserList{" +
+                "mTitle='" + mTitle + '\'' +
+                '}';
+    }
 }
