@@ -11,6 +11,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,7 +63,8 @@ public class MainActivity extends AppCompatActivity
     private HashMap<String, UserList> mUserLists;
     private InputMethodManager mInputMethodManager;
     private GoogleApiClient mGoogleApiClient;
-    private String mRequestedListRef;
+    private String mListRefToShow;
+    private String mListRefToInvite;
     private int mSelectedColor;
     private int mUnselectedColor;
     private int mSelectedCount;
@@ -237,9 +239,19 @@ public class MainActivity extends AppCompatActivity
                     userList.key = listRef;
                     Log.d(TAG, "Got list: " + userList);
                     thisUsersLists.add(userList);
-                    if (listRef.equals(mRequestedListRef)) {
+
+                    boolean seeDetails = false;
+                    if (listRef.equals(mListRefToInvite)) {
+                        Log.d(TAG, "Invited to list detail");
+                        mListRefToInvite = null;
+                        addListToUser(listRef);
+                        seeDetails = true;
+                    } else if (listRef.equals(mListRefToShow)) {
                         Log.d(TAG, "Going to list detail");
-                        mRequestedListRef = null;
+                        mListRefToShow = null;
+                        seeDetails = true;
+                    }
+                    if (seeDetails) {
                         startActivity(
                                 ListDetailActivity.getStartIntent(this, mDisplayName, mPhotoUri,
                                         userList.title, listRef));
@@ -254,6 +266,11 @@ public class MainActivity extends AppCompatActivity
 
 
         mAdapter.setItems(thisUsersLists);
+    }
+
+
+    private void addListToUser(String listRef) {
+        mDbRef.child("users").child(mUuid).child("lists").push().setValue(listRef);
     }
 
 
@@ -300,8 +317,13 @@ public class MainActivity extends AppCompatActivity
     private void processIntent(Intent intent) {
         Uri data = intent.getData();
         if (data != null) {
-            mRequestedListRef = data.getQueryParameter("list");
-            Log.d(TAG, "Requested list ref: " + mRequestedListRef);
+            mListRefToInvite = data.getQueryParameter("invite");
+            if (TextUtils.isEmpty(mListRefToInvite)) {
+                mListRefToShow = data.getQueryParameter("list");
+                Log.d(TAG, "Show list ref: " + mListRefToShow);
+            } else {
+                Log.d(TAG, "Invited to list ref: " + mListRefToInvite);
+            }
         }
     }
 
@@ -315,7 +337,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.menu_item_link_test:
                 Uri link = Uri.parse("https://g5xnr.app.goo.gl/?apn=com.whizbang.listster")
                         .buildUpon()
-                        .appendQueryParameter("link", "https://listster?list=-KOAgLJMsHeGxLJ-JgF4")
+                        .appendQueryParameter("link",
+                                "https://listster?invite=-KOAgLJMsHeGxLJ-JgF4")
                         .build();
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
