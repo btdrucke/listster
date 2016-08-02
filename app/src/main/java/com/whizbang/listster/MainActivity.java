@@ -1,13 +1,21 @@
 package com.whizbang.listster;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView.LayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,8 +26,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.whizbang.listster.list.ListActivity;
+import com.whizbang.listster.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     private Uri mPhotoUri;
     private String mUuid;
     private DatabaseReference mDbRef;
+    private boolean mToolbarCollapsed = true;
+    private ActivityMainBinding mBinding;
+    private ListItemAdapter mAdapter;
 
 
     @Override
@@ -39,13 +51,62 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = (Button) findViewById(R.id.list_activity_button);
-        button.setOnClickListener(new OnClickListener() {
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        final Toolbar toolbar = mBinding.toolbar;
+        mBinding.appbar.setExpanded(false);
+        setSupportActionBar(toolbar);
+        mBinding.fab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(ListActivity.getStartIntent(getApplicationContext(), mDisplayName));
+                mBinding.appbar.setExpanded(true);
+                mBinding.titleEditText.setFocusable(true);
+                mBinding.titleEditText.requestFocus();
+                mToolbarCollapsed = false;
             }
         });
+
+        mBinding.titleEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    getWindow().setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+        mBinding.titleEditText.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    addList(v.getText().toString());
+                    handled = true;
+                }
+                return handled;
+            }
+        });
+        mBinding.recycler.setHasFixedSize(true);
+        LayoutManager layoutManager = new LinearLayoutManager(this);
+        mBinding.recycler.setLayoutManager(layoutManager);
+
+        mAdapter = new ListItemAdapter(new ArrayList<ListItemRowModel>());
+        mBinding.recycler.setAdapter(mAdapter);
+    }
+
+
+    private void addList(String listTitle) {
+        mAdapter.addItem(new ListItemRowModel(listTitle));
+        writeNewList(listTitle);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (!mToolbarCollapsed) {
+            mBinding.appbar.setExpanded(false);
+        } else {
+            super.onBackPressed();
+        }
     }
 
 
@@ -90,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            writeNewList("List1");
-            writeNewList("List2");
         }
     }
 
@@ -99,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     private void onListsChange(DataSnapshot dataSnapshot) {
         GenericTypeIndicator<List<UserList>> t = new GenericTypeIndicator<List<UserList>>() {
         };
-        List<UserList> messages = dataSnapshot.getValue(t);
+        //        List<UserList> messages = dataSnapshot.getValue(t);
     }
 
 
