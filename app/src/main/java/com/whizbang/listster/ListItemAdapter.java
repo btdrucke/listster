@@ -2,6 +2,7 @@ package com.whizbang.listster;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -27,11 +28,13 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     public static class ListItemViewHolder extends RecyclerView.ViewHolder {
 
         public TextView titleTextView;
+        public TextView lastModifiedTextView;
 
 
         public ListItemViewHolder(ListItemRowBinding binding) {
             super(binding.getRoot());
             titleTextView = binding.title;
+            lastModifiedTextView = binding.date;
         }
     }
 
@@ -46,7 +49,13 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
     @Override
     public void onBindViewHolder(ListItemViewHolder holder, int position) {
-        holder.titleTextView.setText(mDataset.get(position).title);
+        UserList userList = mDataset.get(position);
+        holder.titleTextView.setText(userList.title);
+        holder.lastModifiedTextView.setText(
+                DateUtils.formatDateTime(holder.lastModifiedTextView.getContext(),
+                        userList.lastModifedUtcMillis, DateUtils.FORMAT_ABBREV_RELATIVE |
+                                DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE |
+                                DateUtils.FORMAT_SHOW_WEEKDAY));
     }
 
 
