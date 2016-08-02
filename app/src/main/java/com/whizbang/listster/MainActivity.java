@@ -49,16 +49,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final Toolbar toolbar = mBinding.toolbar;
         mBinding.appbar.setExpanded(false);
         setSupportActionBar(toolbar);
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
         mBinding.fab.setOnClickListener(v -> {
-            mBinding.appbar.setExpanded(true);
-            mBinding.titleEditText.setFocusable(true);
+            mBinding.titleTextInputLayout.setVisibility(View.VISIBLE);
             mBinding.titleEditText.requestFocus();
             mToolbarCollapsed = false;
             showKeyboard();
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 mBinding.titleEditText.setText("");
                 hideKeyboard(v);
                 mBinding.getRoot().requestFocus();
-                mBinding.appbar.setExpanded(false);
+                mBinding.titleTextInputLayout.setVisibility(View.GONE);
                 mToolbarCollapsed = true;
             }
             return handled;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (!mToolbarCollapsed) {
-            mBinding.appbar.setExpanded(false);
+            mBinding.titleTextInputLayout.setVisibility(View.GONE);
         } else {
             super.onBackPressed();
         }
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, GoogleSignInActivity.class));
         } else {
             getUserData(user);
-            setTitle(mDisplayName);
+            mBinding.toolbarTitle.setText(getString(R.string.users_lists, mDisplayName));
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             mDbRef = database.getReference();
@@ -184,10 +183,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUi() {
         List<UserList> thisUsersLists = new ArrayList<>();
-        for(String listRef : mUserListRefs.values()) {
-            UserList userList = mUserLists.get(listRef);
-            Log.d(TAG, "Got list: " + userList);
-            thisUsersLists.add(userList);
+        if (mUserListRefs != null) {
+            for (String listRef : mUserListRefs.values()) {
+                UserList userList = mUserLists.get(listRef);
+                Log.d(TAG, "Got list: " + userList);
+                thisUsersLists.add(userList);
+            }
         }
         Collections.sort(thisUsersLists, (lhs, rhs) -> {
             // By last modified time, descending.
