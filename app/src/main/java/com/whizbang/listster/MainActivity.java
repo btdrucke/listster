@@ -1,6 +1,5 @@
 package com.whizbang.listster;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -231,6 +230,7 @@ public class MainActivity extends AppCompatActivity
                 Log.d(TAG, "Got list: " + userList);
                 thisUsersLists.add(userList);
                 if (listRef.equals(mRequestedListRef)) {
+                    Log.d(TAG, "Going to list detail");
                     startActivity(ListDetailActivity.getStartIntent(this, listRef));
                 }
             }
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity
                 GoogleSignInActivity.signOutFromApp(this);
                 return true;
             case R.id.menu_item_link_test:
-                Uri link = Uri.parse("listster://link/?list=123ABC");
+                Uri link = Uri.parse("listster://link/?list=-KOAgLJMsHeGxLJ-JgF4");
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);

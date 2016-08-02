@@ -26,8 +26,9 @@ public class UserList {
     @Override
     public String toString() {
         return "UserList{" +
-                "lastModifedUtcMillis=" + lastModifedUtcMillis +
+                "key='" + key + '\'' +
                 ", title='" + title + '\'' +
+                ", lastModifedUtcMillis=" + lastModifedUtcMillis +
                 '}';
     }
 }
