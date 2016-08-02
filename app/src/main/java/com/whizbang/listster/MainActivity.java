@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean mToolbarCollapsed = true;
     private ActivityMainBinding mBinding;
     private ListItemAdapter mAdapter;
+    private List<String> mUserListRefs;
+    private List<UserList> mUserLists;
 
 
     @Override
@@ -123,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             mDbRef = database.getReference();
 
-            DatabaseReference usersListsRef = database.getReference("users/" + mUuid);
+            DatabaseReference usersListsRef = database.getReference("users/" + mUuid + "/lists");
             usersListsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    onListsChange(dataSnapshot);
+                    onUsersChange(dataSnapshot);
                 }
 
 
@@ -155,16 +157,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void onUsersChange(DataSnapshot dataSnapshot) {
+        GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {
+        };
+        mUserListRefs = dataSnapshot.getValue(t);
+        if (mUserLists != null) {
+            updateUi();
+        }
+    }
+
+
     private void onListsChange(DataSnapshot dataSnapshot) {
         GenericTypeIndicator<List<UserList>> t = new GenericTypeIndicator<List<UserList>>() {
         };
-        //        List<UserList> messages = dataSnapshot.getValue(t);
+        mUserLists = dataSnapshot.getValue(t);
+        if (mUserListRefs != null) {
+            updateUi();
+        }
     }
 
 
     private void onCancelled(DatabaseError error) {
         // Failed to read value
         Log.w(TAG, "Failed to read value.", error.toException());
+    }
+
+
+    private void updateUi() {
+
     }
 
 
