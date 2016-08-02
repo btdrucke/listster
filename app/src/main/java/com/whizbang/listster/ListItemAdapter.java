@@ -57,6 +57,6 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
     public void addItem(ListItemRowModel listItem) {
         mDataset.add(0, listItem);
-        notifyItemInserted(0);
+        notifyDataSetChanged();
     }
 }
