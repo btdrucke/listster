@@ -25,10 +25,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data
-                    android:host="link"
-                    android:path="/"
-                    android:scheme="listster"/>
+                <data android:host="listster" android:scheme="http"/>
+                <data android:host="listster" android:scheme="https"/>
             </intent-filter>
         </activity>
 

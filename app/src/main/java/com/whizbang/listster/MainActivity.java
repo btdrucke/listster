@@ -108,8 +108,7 @@ public class MainActivity extends AppCompatActivity
                 .addApi(AppInvite.API)
                 .build();
 
-        boolean autoLaunchDeepLink = false;
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
                 .setResultCallback(result -> {
                     if (result.getStatus().isSuccess()) {
                         // Extract deep link from Intent
@@ -231,6 +230,7 @@ public class MainActivity extends AppCompatActivity
                 thisUsersLists.add(userList);
                 if (listRef.equals(mRequestedListRef)) {
                     Log.d(TAG, "Going to list detail");
+                    mRequestedListRef = null;
                     startActivity(ListDetailActivity.getStartIntent(this, listRef));
                 }
             }
@@ -300,7 +300,10 @@ public class MainActivity extends AppCompatActivity
                 GoogleSignInActivity.signOutFromApp(this);
                 return true;
             case R.id.menu_item_link_test:
-                Uri link = Uri.parse("listster://link/?list=-KOAgLJMsHeGxLJ-JgF4");
+                Uri link = Uri.parse("https://g5xnr.app.goo.gl/?apn=com.whizbang.listster")
+                        .buildUpon()
+                        .appendQueryParameter("link", "https://listster?list=-KOAgLJMsHeGxLJ-JgF4")
+                        .build();
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
