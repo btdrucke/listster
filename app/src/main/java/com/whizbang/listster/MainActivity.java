@@ -11,7 +11,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,11 +63,11 @@ public class MainActivity extends AppCompatActivity
     private InputMethodManager mInputMethodManager;
     private GoogleApiClient mGoogleApiClient;
     private String mListRefToShow;
-    private String mListRefToInvite;
     private int mSelectedColor;
     private int mUnselectedColor;
     private int mSelectedCount;
     private MenuItem mDeleteItem;
+    private String mInviteListRef;
 
 
     @Override
@@ -78,7 +77,9 @@ public class MainActivity extends AppCompatActivity
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Instance token: " + token);
 
-        processIntent(getIntent());
+        if (savedInstanceState == null) {
+            processIntent(getIntent());
+        }
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final Toolbar toolbar = mBinding.toolbar;
@@ -231,27 +232,27 @@ public class MainActivity extends AppCompatActivity
 
 
     private void updateUi() {
+        if (mInviteListRef != null) {
+            boolean didAdd = addListToUser(mInviteListRef);
+            mListRefToShow = mInviteListRef;
+            mInviteListRef = null;
+            if (didAdd) {
+                return;
+            }
+        }
+
         List<UserList> thisUsersLists = new ArrayList<>();
         if (mUserListRefs != null) {
             for (String listRef : mUserListRefs.values()) {
                 UserList userList = mUserLists.get(listRef);
-                if (userList != null && userList.key != null) {
+                if (userList != null) {
                     userList.key = listRef;
                     Log.d(TAG, "Got list: " + userList);
                     thisUsersLists.add(userList);
 
-                    boolean seeDetails = false;
-                    if (listRef.equals(mListRefToInvite)) {
-                        Log.d(TAG, "Invited to list detail");
-                        mListRefToInvite = null;
-                        addListToUser(listRef);
-                        seeDetails = true;
-                    } else if (listRef.equals(mListRefToShow)) {
+                    if (listRef.equals(mListRefToShow)) {
                         Log.d(TAG, "Going to list detail");
                         mListRefToShow = null;
-                        seeDetails = true;
-                    }
-                    if (seeDetails) {
                         startActivity(
                                 ListDetailActivity.getStartIntent(this, mDisplayName, mPhotoUri,
                                         userList.title, listRef));
@@ -269,8 +270,13 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private void addListToUser(String listRef) {
+    private boolean addListToUser(String listRef) {
+        if (mUserListRefs.containsValue(listRef)) {
+            // Already got it.
+            return false;
+        }
         mDbRef.child("users").child(mUuid).child("lists").push().setValue(listRef);
+        return true;
     }
 
 
@@ -317,13 +323,8 @@ public class MainActivity extends AppCompatActivity
     private void processIntent(Intent intent) {
         Uri data = intent.getData();
         if (data != null) {
-            mListRefToInvite = data.getQueryParameter("invite");
-            if (TextUtils.isEmpty(mListRefToInvite)) {
-                mListRefToShow = data.getQueryParameter("list");
-                Log.d(TAG, "Show list ref: " + mListRefToShow);
-            } else {
-                Log.d(TAG, "Invited to list ref: " + mListRefToInvite);
-            }
+            mInviteListRef = data.getQueryParameter("invite");
+            mListRefToShow = data.getQueryParameter("list");
         }
     }
 
@@ -338,7 +339,7 @@ public class MainActivity extends AppCompatActivity
                 Uri link = Uri.parse("https://g5xnr.app.goo.gl/?apn=com.whizbang.listster")
                         .buildUpon()
                         .appendQueryParameter("link",
-                                "https://listster?invite=-KOAgLJMsHeGxLJ-JgF4")
+                                "https://listster?invite=-KO8jHZw2TTSm7H_Qtad")
                         .build();
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
