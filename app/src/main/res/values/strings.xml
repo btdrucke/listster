@@ -15,5 +15,9 @@
     <string name="description">Description</string>
     <string name="menu_logout">Logout</string>
     <string name="menu_link_test">Test link</string>
+<<<<<<< e7a571a5aa878c2093e58445444f73fcdbf40a3e
     <string name="menu_share">Share</string>
+=======
+    <string name="delete">delete</string>
+>>>>>>> delete working
 </resources>

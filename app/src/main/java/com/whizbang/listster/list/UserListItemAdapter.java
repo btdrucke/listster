@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -23,12 +24,15 @@ public class UserListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder
 
 
     public ArrayList<UserList> dataSet;
+    private OnLongClickListener mOnLongClickListener;
     private OnClickListener mClickListener;
 
 
-    public UserListItemAdapter(ArrayList<UserList> data, OnClickListener listener) {
+    public UserListItemAdapter(ArrayList<UserList> data, OnClickListener clickListener,
+            OnLongClickListener longClickListener) {
         dataSet = data;
-        mClickListener = listener;
+        mClickListener = clickListener;
+        mOnLongClickListener = longClickListener;
     }
 
 
@@ -64,6 +68,7 @@ public class UserListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder
     public void onBindViewHolder(ListItemViewHolder holder, int position) {
         UserList userList = dataSet.get(position);
         holder.cardView.setOnClickListener(mClickListener);
+        holder.cardView.setOnLongClickListener(mOnLongClickListener);
         holder.titleTextView.setText(userList.title);
         holder.lastModifiedTextView.setText(
                 DateUtils.formatDateTime(holder.lastModifiedTextView.getContext(),
