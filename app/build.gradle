@@ -36,6 +36,11 @@ android {
     dataBinding {
         enabled = true
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 
@@ -52,7 +57,11 @@ dependencies {
 
     compile 'com.google.firebase:firebase-messaging:9.4.0'
     compile 'com.google.firebase:firebase-invites:9.4.0'
-    compile 'com.android.support:recyclerview-v7:23.2.1'
+}
+
+apply plugin: 'me.tatarka.retrolambda'
+dependencies {
+    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

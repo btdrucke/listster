@@ -30,6 +30,7 @@ import com.whizbang.listster.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -199,6 +200,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Got list: " + userList);
             thisUsersLists.add(userList);
         }
+        Collections.sort(thisUsersLists, new Comparator<UserList>() {
+            @Override
+            public int compare(UserList lhs, UserList rhs) {
+                // By last modified time, descending.
+                return Long.compare(rhs.lastModifedUtcMillis, lhs.lastModifedUtcMillis);
+            }
+        });
         mAdapter.setItems(thisUsersLists);
     }
 
