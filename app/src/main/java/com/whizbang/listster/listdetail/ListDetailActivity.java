@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.whizbang.listster.GoogleSignInActivity;
 import com.whizbang.listster.R;
+import com.whizbang.listster.databinding.ActivityListBinding;
 
 import java.util.HashMap;
 
@@ -47,7 +49,7 @@ public class ListDetailActivity extends AppCompatActivity {
     private String mListKey;
     private String mDisplayName;
     private DatabaseReference mDbRef;
-    private ListBinding mBinding;
+    private ActivityListBinding mBinding;
     private HashMap<String, String> mUserItemsRefs;
     private HashMap<String, ListDetailItem> mUserItems;
     private Uri mPhotoUri;
@@ -79,9 +81,8 @@ public class ListDetailActivity extends AppCompatActivity {
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Instance token: " + token);
 
-        mBinding = DataBindingUtil.setContentView(this, R.layout.list);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_list);
         final Toolbar toolbar = mBinding.toolbar;
-        setTitle(mListKey);
         setSupportActionBar(toolbar);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list_items);
@@ -207,8 +208,8 @@ public class ListDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_item_share:
-                Log.d(TAG, "share");
+            case R.id.menu_item_invite:
+                Log.d(TAG, "invite");
                 onInviteClicked();
                 return true;
             default:
@@ -227,7 +228,6 @@ public class ListDetailActivity extends AppCompatActivity {
                 getString(R.string.invitation_title)).setMessage(
                 getString(R.string.invitation_message, mDisplayName, mListTitle))
                 .setDeepLink(link)
-                .setCustomImage(mPhotoUri)
                 .setCallToActionText(getString(R.string.invitation_cta))
                 .build();
         startActivityForResult(intent, REQUEST_INVITE);
@@ -247,8 +247,7 @@ public class ListDetailActivity extends AppCompatActivity {
                     Log.d(TAG, "onActivityResult: sent invitation " + id);
                 }
             } else {
-                // Sending failed or it was canceled, show failure message to the user
-                // ...
+                Snackbar.make(mBinding.getRoot(), R.string.invite_failed, Snackbar.LENGTH_LONG).show();
             }
         }
     }
