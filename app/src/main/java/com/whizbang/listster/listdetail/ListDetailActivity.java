@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -56,6 +57,7 @@ public class ListDetailActivity extends AppCompatActivity {
     private HashMap<String, ListDetailItem> mUserItems;
     private Uri mPhotoUri;
     private String mListTitle;
+    private EditText mNewTask;
 
 
     public static Intent getStartIntent(Context context, String displayName, Uri photoUri,
@@ -86,10 +88,20 @@ public class ListDetailActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_list);
         final Toolbar toolbar = mBinding.toolbar;
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.list_items);
-        final EditText newTask = (EditText) findViewById(R.id.new_item);
-        ImageView addButton = (ImageView) findViewById(R.id.add_item_button);
+        mRecyclerView = mBinding.listItems;
+        mNewTask = mBinding.newItem;
+        ImageView addButton = mBinding.addItemButton;
+
+        mNewTask.setOnEditorActionListener((v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                addItem();
+            }
+            return handled;
+        });
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -98,18 +110,18 @@ public class ListDetailActivity extends AppCompatActivity {
 
         if (addButton != null) {
             addButton.setOnClickListener(v -> {
-                String title = newTask.getText().toString();
-                String author = mDisplayName;
-                addItem(title, author, false);
-                newTask.setText("");
+                addItem();
             });
         }
     }
 
 
-    private void addItem(String title, String author, boolean completed) {
-        String key = writeNewItem(title, author, completed);
-        mAdapter.addItem(new ListDetailItem(key, title, author, completed));
+    private void addItem() {
+        String title = mNewTask.getText().toString();
+        String author = mDisplayName;
+        String key = writeNewItem(title, author, false);
+        mAdapter.addItem(new ListDetailItem(key, title, author, false));
+        mNewTask.setText("");
     }
 
 
@@ -200,6 +212,9 @@ public class ListDetailActivity extends AppCompatActivity {
             case R.id.menu_item_invite:
                 Log.d(TAG, "invite");
                 onInviteClicked();
+                return true;
+            case android.R.id.home:
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
