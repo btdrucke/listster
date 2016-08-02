@@ -12,8 +12,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ListItemAdapter mAdapter;
     private HashMap<String, String> mUserListRefs;
     private HashMap<String, UserList> mUserLists;
+    private InputMethodManager mInputMethodManager;
 
 
     @Override
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         final Toolbar toolbar = mBinding.toolbar;
         mBinding.appbar.setExpanded(false);
         setSupportActionBar(toolbar);
+        mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         mBinding.fab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,18 +66,10 @@ public class MainActivity extends AppCompatActivity {
                 mBinding.titleEditText.setFocusable(true);
                 mBinding.titleEditText.requestFocus();
                 mToolbarCollapsed = false;
+                showKeyboard();
             }
         });
 
-        mBinding.titleEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    getWindow().setSoftInputMode(
-                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
-            }
-        });
         mBinding.titleEditText.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -83,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     addList(v.getText().toString());
                     handled = true;
+                    mBinding.titleEditText.setText("");
+                    hideKeyboard(v);
+                    mBinding.getRoot().requestFocus();
+                    mBinding.appbar.setExpanded(false);
+                    mToolbarCollapsed = true;
                 }
                 return handled;
             }
@@ -93,6 +92,16 @@ public class MainActivity extends AppCompatActivity {
 
         mAdapter = new ListItemAdapter(new ArrayList<ListItemRowModel>());
         mBinding.recycler.setAdapter(mAdapter);
+    }
+
+
+    private void showKeyboard() {
+        mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+
+    private void hideKeyboard(View v) {
+        mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
 
