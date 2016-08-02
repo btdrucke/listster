@@ -5,7 +5,9 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 
@@ -44,7 +47,7 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity
-        implements OnClickListener, OnConnectionFailedListener {
+        implements OnClickListener, OnConnectionFailedListener, OnLongClickListener {
 
     private static final String TAG = "Listster";
 
@@ -60,6 +63,10 @@ public class MainActivity extends AppCompatActivity
     private InputMethodManager mInputMethodManager;
     private GoogleApiClient mGoogleApiClient;
     private String mRequestedListRef;
+    private int mSelectedColor;
+    private int mUnselectedColor;
+    private int mSelectedCount;
+    private MenuItem mDeleteItem;
 
 
     @Override
@@ -101,7 +108,7 @@ public class MainActivity extends AppCompatActivity
         LayoutManager layoutManager = new LinearLayoutManager(this);
         mBinding.recycler.setLayoutManager(layoutManager);
 
-        mAdapter = new UserListItemAdapter(new ArrayList<>(), this);
+        mAdapter = new UserListItemAdapter(new ArrayList<>(), this, this);
         mBinding.recycler.setAdapter(mAdapter);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, this)
@@ -114,12 +121,13 @@ public class MainActivity extends AppCompatActivity
                         // Extract deep link from Intent
                         Intent intent = result.getInvitationIntent();
                         String deepLink = AppInviteReferral.getDeepLink(intent);
-
                         Log.d(TAG, deepLink);
                     } else {
                         Log.d(TAG, "getInvitation: no deep link found.");
                     }
                 });
+        mSelectedColor = ContextCompat.getColor(this, R.color.colorAccent);
+        mUnselectedColor = ContextCompat.getColor(this, R.color.cardview_light_background);
     }
 
 
@@ -225,13 +233,15 @@ public class MainActivity extends AppCompatActivity
         if (mUserListRefs != null) {
             for (String listRef : mUserListRefs.values()) {
                 UserList userList = mUserLists.get(listRef);
-                userList.key = listRef;
-                Log.d(TAG, "Got list: " + userList);
-                thisUsersLists.add(userList);
-                if (listRef.equals(mRequestedListRef)) {
-                    Log.d(TAG, "Going to list detail");
-                    mRequestedListRef = null;
-                    startActivity(ListDetailActivity.getStartIntent(this, listRef));
+                if (userList != null && userList.key != null) {
+                    userList.key = listRef;
+                    Log.d(TAG, "Got list: " + userList);
+                    thisUsersLists.add(userList);
+                    if (listRef.equals(mRequestedListRef)) {
+                        Log.d(TAG, "Going to list detail");
+                        mRequestedListRef = null;
+                        startActivity(ListDetailActivity.getStartIntent(this, listRef));
+                    }
                 }
             }
         }
@@ -273,6 +283,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.activity_menu, menu);
+        mDeleteItem = menu.findItem(R.id.menu_item_delete);
         return true;
     }
 
@@ -307,22 +318,86 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                return true;
+            case R.id.menu_item_delete:
+                for (int i = 0; i < mBinding.recycler.getChildCount(); i++) {
+                    View child = mBinding.recycler.getChildAt(i);
+                    if (child.isSelected()) {
+                        int position = mBinding.recycler.getChildAdapterPosition(child);
+                        UserList list = mAdapter.dataSet.get(position);
+                        mDbRef.child("lists").child(list.key).removeValue();
+                    }
+                }
+                unselectAll();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
 
+    private void unselectAll() {
+        for (int i = 0; i < mBinding.recycler.getChildCount(); i++) {
+            unselectView(mBinding.recycler.getChildAt(i));
+        }
+    }
+
+
     @Override
     public void onClick(View v) {
-        int position = mBinding.recycler.getChildAdapterPosition(v);
-        String key = mAdapter.dataSet.get(position).key;
-        startActivity(ListDetailActivity.getStartIntent(this, key));
+        if (mSelectedCount > 0 && !v.isSelected()) {
+            selectView(v);
+        } else if (v.isSelected()) {
+            unselectView(v);
+        } else {
+            int position = mBinding.recycler.getChildAdapterPosition(v);
+            String key = mAdapter.dataSet.get(position).key;
+            startActivity(ListDetailActivity.getStartIntent(this, key));
+        }
     }
 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.w(TAG, "Connection error: " + connectionResult.getErrorMessage());
+    }
+
+
+    @Override
+    public boolean onLongClick(View v) {
+        if (v.isSelected()) {
+            unselectView(v);
+        } else {
+            selectView(v);
+        }
+        return true;
+    }
+
+
+    private void selectView(View v) {
+        mSelectedCount++;
+        showTrashCan();
+        v.setSelected(true);
+        ((CardView) v).setCardBackgroundColor(mSelectedColor);
+    }
+
+
+    private void showTrashCan() {
+        mDeleteItem.setVisible(true);
+    }
+
+
+    private void unselectView(View v) {
+        mSelectedCount--;
+        if (mSelectedCount <= 0) {
+            hideTrashCan();
+        }
+        v.setSelected(false);
+        ((CardView) v).setCardBackgroundColor(mUnselectedColor);
+    }
+
+
+    private void hideTrashCan() {
+        mDeleteItem.setVisible(false);
     }
 }
