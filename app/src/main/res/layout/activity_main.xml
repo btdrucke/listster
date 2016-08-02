@@ -64,15 +64,14 @@
 
                 </android.support.design.widget.CollapsingToolbarLayout>
 
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"/>
+
             </android.support.design.widget.AppBarLayout>
 
         </android.support.design.widget.CoordinatorLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler"
-            android:layout_below="@+id/coordinator"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
