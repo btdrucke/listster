@@ -221,7 +221,7 @@ public class ListDetailActivity extends AppCompatActivity {
     private void onInviteClicked() {
         Uri link = Uri.parse("https://g5xnr.app.goo.gl/?apn=com.whizbang.listster")
                 .buildUpon()
-                .appendQueryParameter("link", "https://listster?list=" + mListKey)
+                .appendQueryParameter("link", "https://listster?invite=" + mListKey)
                 .build();
 
         Intent intent = new AppInviteInvitation.IntentBuilder(
