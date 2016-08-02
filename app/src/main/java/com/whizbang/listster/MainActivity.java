@@ -29,7 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.whizbang.listster.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean mToolbarCollapsed = true;
     private ActivityMainBinding mBinding;
     private ListItemAdapter mAdapter;
+    private HashMap<String, String> mUserListRefs;
+    private HashMap<String, UserList> mUserLists;
 
 
     @Override
@@ -123,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             mDbRef = database.getReference();
 
-            DatabaseReference usersListsRef = database.getReference("users/" + mUuid);
+            DatabaseReference usersListsRef = database.getReference("users/" + mUuid + "/lists");
             usersListsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    onListsChange(dataSnapshot);
+                    onUsersChange(dataSnapshot);
                 }
 
 
@@ -150,21 +152,41 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.onCancelled(error);
                 }
             });
+        }
+    }
 
+
+    private void onUsersChange(DataSnapshot dataSnapshot) {
+        GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
+        };
+        mUserListRefs = dataSnapshot.getValue(t);
+        if (mUserLists != null) {
+            updateUi();
         }
     }
 
 
     private void onListsChange(DataSnapshot dataSnapshot) {
-        GenericTypeIndicator<List<UserList>> t = new GenericTypeIndicator<List<UserList>>() {
+        GenericTypeIndicator<HashMap<String, UserList>> t = new GenericTypeIndicator<HashMap<String, UserList>>() {
         };
-        //        List<UserList> messages = dataSnapshot.getValue(t);
+        mUserLists = dataSnapshot.getValue(t);
+        if (mUserListRefs != null) {
+            updateUi();
+        }
     }
 
 
     private void onCancelled(DatabaseError error) {
         // Failed to read value
         Log.w(TAG, "Failed to read value.", error.toException());
+    }
+
+
+    private void updateUi() {
+        for(String listRef : mUserListRefs.values()) {
+            UserList userList = mUserLists.get(listRef);
+            Log.d(TAG, "Got list: " + userList);
+        }
     }
 
 
