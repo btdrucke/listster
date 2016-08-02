@@ -4,6 +4,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.whizbang.listster.R;
@@ -54,7 +57,15 @@ public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.Vi
         TextView title = holder.title;
         title.setText(item.title);
         TextView author = holder.author;
-        author.setText(item.author);
+        author.setText(item.lastModifiedUser);
+
+        CheckBox completeStatus = holder.completeStatus;
+        completeStatus.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Update on Server checked Status
+            }
+        });
     }
 
 
@@ -62,12 +73,14 @@ public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.Vi
 
         public TextView title;
         public TextView author;
+        public CheckBox completeStatus;
 
 
         public ViewHolder(View v) {
             super(v);
             title = (TextView) v.findViewById(R.id.title);
             author = (TextView) v.findViewById(R.id.sub_text);
+            completeStatus = (CheckBox) v.findViewById(R.id.item_completed);
         }
     }
 }

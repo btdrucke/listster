@@ -31,7 +31,9 @@ import com.whizbang.listster.GoogleSignInActivity;
 import com.whizbang.listster.R;
 import com.whizbang.listster.databinding.ActivityListBinding;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class ListDetailActivity extends AppCompatActivity {
@@ -106,8 +108,8 @@ public class ListDetailActivity extends AppCompatActivity {
 
 
     private void addItem(String title, String author, boolean completed) {
-        //        String key = writeNewItem(title, author, completed);
-        mAdapter.addItem(new ListDetailItem(null, title, author, completed));
+        String key = writeNewItem(title, author, completed);
+        mAdapter.addItem(new ListDetailItem(key, title, author, completed));
     }
 
 
@@ -143,10 +145,8 @@ public class ListDetailActivity extends AppCompatActivity {
     private void onItemsChange(DataSnapshot dataSnapshot) {
         GenericTypeIndicator<HashMap<String, ListDetailItem>> t = new GenericTypeIndicator<HashMap<String, ListDetailItem>>() {
         };
-        //        mUserItems = dataSnapshot.getValue(t);
-        //        if (mUserItemsRefs != null) {
-        //            updateUi();
-        //        }
+        mUserItems = dataSnapshot.getValue(t);
+        updateUi();
     }
 
 
@@ -157,22 +157,14 @@ public class ListDetailActivity extends AppCompatActivity {
 
 
     private void updateUi() {
-        //        List<ListDetailItem> thisUsersLists = new ArrayList<>();
-        //        if (mUserItemsRefs != null) {
-        //            for (String listRef : mUserItemsRefs.values()) {
-        //                UserList userList = mUserItems.get(listRef);
-        //                userList.key = listRef;
-        //                Log.d(TAG, "Got list: " + userList);
-        //                thisUsersLists.add(userList);
-        //            }
-        //        }
-        //        Collections.sort(thisUsersLists, (lhs, rhs) -> {
-        //            // By last modified time, descending.
-        //            return Long.compare(rhs.lastModifedUtcMillis, lhs.lastModifedUtcMillis);
-        //        });
-        //
-        //
-        //        mAdapter.setItems(thisUsersLists);
+        List<ListDetailItem> thisUsersListItems = new ArrayList<>();
+        if (mUserItems != null) {
+            for (ListDetailItem item : mUserItems.values()) {
+                thisUsersListItems.add(item);
+            }
+        }
+
+        mAdapter.setItems(thisUsersListItems);
     }
 
 
@@ -189,10 +181,7 @@ public class ListDetailActivity extends AppCompatActivity {
     private String writeNewItem(String title, String author, boolean completed) {
         DatabaseReference newItem = mDbRef.child("items").push();
         String key = newItem.getKey();
-        newItem.child("listKey").setValue(mListKey);
-        newItem.child("title").setValue(title);
-        newItem.child("user").setValue(author);
-        newItem.child("status").setValue(completed);
+        newItem.setValue(new ListDetailItem(mListKey, title, author, completed));
         return key;
     }
 
@@ -247,7 +236,8 @@ public class ListDetailActivity extends AppCompatActivity {
                     Log.d(TAG, "onActivityResult: sent invitation " + id);
                 }
             } else {
-                Snackbar.make(mBinding.getRoot(), R.string.invite_failed, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mBinding.getRoot(), R.string.invite_failed, Snackbar.LENGTH_LONG)
+                        .show();
             }
         }
     }
