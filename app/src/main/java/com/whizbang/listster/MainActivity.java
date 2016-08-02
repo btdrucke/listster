@@ -16,8 +16,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.whizbang.listster.list.ListActivity;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -86,13 +89,17 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.onCancelled(error);
                 }
             });
+
+            writeNewList("List1");
+            writeNewList("List2");
         }
     }
 
 
     private void onListsChange(DataSnapshot dataSnapshot) {
-        String value = dataSnapshot.getValue(String.class);
-        Log.d(TAG, "Value is: " + value);
+        GenericTypeIndicator<List<UserList>> t = new GenericTypeIndicator<List<UserList>>() {
+        };
+        List<UserList> messages = dataSnapshot.getValue(t);
     }
 
 
@@ -120,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     private void writeNewList(String title) {
         DatabaseReference newList = mDbRef.child("lists").push();
         String key = newList.getKey();
-        newList.child("title").setValue(title);
+        newList.setValue(new UserList(title));
         mDbRef.child("users").child("lists").push().setValue(key);
     }
 }
