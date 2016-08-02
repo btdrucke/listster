@@ -33,6 +33,7 @@ import com.whizbang.listster.R;
 import com.whizbang.listster.databinding.ActivityListBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,7 +54,6 @@ public class ListDetailActivity extends AppCompatActivity {
     private String mDisplayName;
     private DatabaseReference mDbRef;
     private ActivityListBinding mBinding;
-    private HashMap<String, String> mUserItemsRefs;
     private HashMap<String, ListDetailItem> mUserItems;
     private Uri mPhotoUri;
     private String mListTitle;
@@ -113,6 +113,7 @@ public class ListDetailActivity extends AppCompatActivity {
                 addItem();
             });
         }
+
     }
 
 
@@ -177,6 +178,11 @@ public class ListDetailActivity extends AppCompatActivity {
                 }
             }
         }
+
+        Collections.sort(thisUsersListItems, (lhs, rhs) -> {
+            // By last modified time, descending.
+            return Long.compare(rhs.lastModifiedUtcMillis, lhs.lastModifiedUtcMillis);
+        });
 
         mAdapter.setItems(thisUsersListItems);
     }
