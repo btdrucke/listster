@@ -30,16 +30,27 @@
         android:textSize="20sp"/>
 
     <TextView
-        android:id="@+id/sub_text"
+        android:id="@+id/date"
         android:ellipsize="end"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/text_secondary"
         android:layout_below="@id/title"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:maxLines="1"
         android:paddingStart="56dp"
-        tools:text="Sub-text"
+        tools:text="Monday 3rd, October"
         android:textSize="14sp"/>
 
+    <TextView
+        android:id="@+id/sub_text"
+        android:ellipsize="end"
+        android:textColor="@color/text_secondary"
+        android:layout_below="@id/date"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:maxLines="1"
+        android:paddingStart="56dp"
+        tools:text="Adewale Desalu"
+        android:textSize="14sp"/>
 
 </RelativeLayout>
