@@ -2,21 +2,23 @@ package com.whizbang.listster;
 
 /**
  * Copyright 2016 Google Inc. All Rights Reserved.
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,6 +49,7 @@ public class GoogleSignInActivity extends BaseActivity
         implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private static final String TAG = "GoogleActivity";
+    private static final String EXTRA_DO_SIGNOUT = "do.signout";
     private static final int RC_SIGN_IN = 9001;
 
     // [START declare_auth]
@@ -59,6 +63,13 @@ public class GoogleSignInActivity extends BaseActivity
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
     private TextView mDetailTextView;
+
+
+    public static void signOutFromApp(Activity activity) {
+        Intent intent = new Intent(activity, GoogleSignInActivity.class);
+        intent.putExtra(EXTRA_DO_SIGNOUT, true);
+        activity.startActivity(intent);
+    }
 
 
     @Override
@@ -90,23 +101,35 @@ public class GoogleSignInActivity extends BaseActivity
         // [END initialize_auth]
 
         // [START auth_state_listener]
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // [START_EXCLUDE]
-                updateUI(user);
-                // [END_EXCLUDE]
+        mAuthListener = firebaseAuth -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                // User is signed in
+                Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+            } else {
+                // User is signed out
+                Log.d(TAG, "onAuthStateChanged:signed_out");
             }
+            // [START_EXCLUDE]
+            updateUI(user);
+            // [END_EXCLUDE]
         };
         // [END auth_state_listener]
+
+        mGoogleApiClient.registerConnectionCallbacks(new ConnectionCallbacks() {
+            @Override
+            public void onConnected(@Nullable Bundle bundle) {
+                if (getIntent().getBooleanExtra(EXTRA_DO_SIGNOUT, false)) {
+                    signOut();
+                }
+            }
+
+
+            @Override
+            public void onConnectionSuspended(int i) {
+
+            }
+        });
     }
 
 
@@ -193,17 +216,10 @@ public class GoogleSignInActivity extends BaseActivity
 
 
     private void signOut() {
+        // Google sign out
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(status -> updateUI(null));
         // Firebase sign out
         mAuth.signOut();
-
-        // Google sign out
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        updateUI(null);
-                    }
-                });
     }
 
 
