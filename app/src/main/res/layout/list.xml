@@ -1,47 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_height="match_parent"
-              android:layout_width="match_parent"
-              android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/add_item_button"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:src="@android:drawable/ic_input_add"
-            android:tint="@color/colorPrimaryDark"/>
-
-
-        <EditText
-            android:id="@+id/new_item"
-            android:ellipsize="end"
-            android:hint="New Task"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/add_item_button"
-            android:layout_width="wrap_content"
-            android:maxLines="1"/>
-
-    </RelativeLayout>
-
-    <View
-        android:background="@color/colorAccent"
-        android:layout_height="2dp"
-        android:layout_width="wrap_content"/>
-
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_items"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:scrollbars="vertical"/>
+        android:orientation="vertical"
+        android:background="@color/cardview_dark_background">
 
-</LinearLayout>
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:elevation="4dp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+
+        </android.support.design.widget.AppBarLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/list_input"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:padding="16dp"
+            android:layout_below="@id/appbar">
+
+            <ImageView
+                android:id="@+id/add_item_button"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@android:drawable/ic_input_add"
+                android:tint="@color/colorPrimaryDark"/>
+
+
+            <EditText
+                android:id="@+id/new_item"
+                android:ellipsize="end"
+                android:hint="New Task"
+                android:backgroundTint="@color/colorAccent"
+                android:textColorHint="@color/colorAccent"
+                android:shadowColor="@color/colorPrimary"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/add_item_button"
+                android:layout_width="wrap_content"
+                android:maxLines="1"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/list_input_divider"
+            android:layout_below="@id/list_input"
+            android:background="@color/colorPrimaryDark"
+            android:layout_height="2dp"
+            android:layout_width="wrap_content"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_below="@id/list_input_divider"
+            android:id="@+id/list_items"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:scrollbars="vertical"/>
+
+    </RelativeLayout>
+</layout>

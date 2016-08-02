@@ -1,5 +1,6 @@
 package com.whizbang.listster.list;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.whizbang.listster.R;
 import com.whizbang.listster.databinding.ListItemRowBinding;
 import com.whizbang.listster.list.UserListItemAdapter.ListItemViewHolder;
+import com.whizbang.listster.listdetail.ListDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,10 @@ public class UserListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder
     public ListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ListItemRowBinding binding = DataBindingUtil.inflate(
                 LayoutInflater.from(parent.getContext()), R.layout.list_item_row, parent, false);
+//        binding.cardView.setOnClickListener(v -> {
+//            Context context = v.getContext();
+//            context.startActivity(ListDetailActivity.getStartIntent(context, null));
+//        });
         return new ListItemViewHolder(binding);
     }
 
