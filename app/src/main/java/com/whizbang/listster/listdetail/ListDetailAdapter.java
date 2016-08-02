@@ -1,6 +1,7 @@
 package com.whizbang.listster.listdetail;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,11 @@ public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.Vi
         title.setText(item.title);
         TextView author = holder.author;
         author.setText(item.lastModifiedUser);
+        String dateStr = DateUtils.formatDateTime(holder.date.getContext(),
+                item.lastModifiedUtcMillis, DateUtils.FORMAT_ABBREV_RELATIVE |
+                        DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE |
+                        DateUtils.FORMAT_SHOW_WEEKDAY);
+        holder.date.setText(dateStr);
 
         CheckBox completeStatus = holder.completeStatus;
         completeStatus.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -72,6 +78,7 @@ public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView title;
+        public TextView date;
         public TextView author;
         public CheckBox completeStatus;
 
@@ -80,6 +87,7 @@ public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.Vi
             super(v);
             title = (TextView) v.findViewById(R.id.title);
             author = (TextView) v.findViewById(R.id.sub_text);
+            date = (TextView) v.findViewById(R.id.date);
             completeStatus = (CheckBox) v.findViewById(R.id.item_completed);
         }
     }
