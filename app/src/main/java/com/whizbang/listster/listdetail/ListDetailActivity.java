@@ -172,7 +172,9 @@ public class ListDetailActivity extends AppCompatActivity {
         List<ListDetailItem> thisUsersListItems = new ArrayList<>();
         if (mUserItems != null) {
             for (ListDetailItem item : mUserItems.values()) {
-                thisUsersListItems.add(item);
+                if (item.listKey.equals(mListKey)) {
+                    thisUsersListItems.add(item);
+                }
             }
         }
 
