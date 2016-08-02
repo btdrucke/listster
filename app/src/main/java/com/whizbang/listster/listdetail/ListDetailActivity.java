@@ -1,4 +1,4 @@
-package com.whizbang.listster.list;
+package com.whizbang.listster.listdetail;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,18 +12,18 @@ import android.widget.ImageView;
 import com.whizbang.listster.R;
 
 
-public class ListActivity extends AppCompatActivity {
+public class ListDetailActivity extends AppCompatActivity {
 
-    private final static String EXTRA_DISPLAY_NAME = "extra_display_name";
+    private final static String EXTRA_LIST_KEY = "extra_list_key";
     private RecyclerView mRecyclerView;
-    private ListAdapter mAdapter;
+    private ListDetailAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private String mDisplayName;
+    private String mListKey;
 
 
-    public static Intent getStartIntent(Context context, String displayName) {
-        Intent intent = new Intent(context, ListActivity.class);
-        intent.putExtra(EXTRA_DISPLAY_NAME, displayName);
+    public static Intent getStartIntent(Context context, String key) {
+        Intent intent = new Intent(context, ListDetailActivity.class);
+        intent.putExtra(EXTRA_LIST_KEY, key);
         return intent;
     }
 
@@ -33,9 +33,9 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
 
-        String displayName = getIntent().getStringExtra(EXTRA_DISPLAY_NAME);
-        if (displayName != null) {
-            mDisplayName = displayName;
+        String key = getIntent().getStringExtra(EXTRA_LIST_KEY);
+        if (key != null) {
+            mListKey = key;
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list_items);
@@ -44,21 +44,21 @@ public class ListActivity extends AppCompatActivity {
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new ListAdapter();
+        mAdapter = new ListDetailAdapter();
         mRecyclerView.setAdapter(mAdapter);
 
         if (addButton != null) {
             addButton.setOnClickListener(v -> {
                 String title = newTask.getText().toString();
-                String author = mDisplayName;
-                addItem(new Item(title, author, false));
+                String author = mListKey;
+                addItem(new ListDetailItem(title, author, false));
                 newTask.setText("");
             });
         }
     }
 
 
-    private void addItem(Item item) {
+    private void addItem(ListDetailItem item) {
         mAdapter.addToDataSet(item);
     }
 }

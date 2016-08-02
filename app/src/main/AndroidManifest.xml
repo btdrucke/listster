@@ -26,7 +26,7 @@
             android:name=".GoogleSignInActivity"/>
 
         <!-- TODO: Add List Title as title in actionbar -->
-        <activity android:name=".list.ListActivity"/>
+        <activity android:name=".listdetail.ListDetailActivity"/>
 
         <service
             android:name=".MyFirebaseMessagingService">

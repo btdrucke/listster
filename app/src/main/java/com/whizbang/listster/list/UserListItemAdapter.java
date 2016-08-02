@@ -1,27 +1,32 @@
-package com.whizbang.listster;
+package com.whizbang.listster.list;
 
 import android.databinding.DataBindingUtil;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.whizbang.listster.ListItemAdapter.ListItemViewHolder;
+import com.whizbang.listster.R;
 import com.whizbang.listster.databinding.ListItemRowBinding;
+import com.whizbang.listster.list.UserListItemAdapter.ListItemViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
+public class UserListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
 
-    private ArrayList<UserList> mDataset;
+    public ArrayList<UserList> dataSet;
+    private OnClickListener mClickListener;
 
 
-    public ListItemAdapter(ArrayList<UserList> data) {
-        mDataset = data;
+    public UserListItemAdapter(ArrayList<UserList> data, OnClickListener listener) {
+        dataSet = data;
+        mClickListener = listener;
     }
 
 
@@ -29,10 +34,12 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
         public TextView titleTextView;
         public TextView lastModifiedTextView;
+        public CardView cardView;
 
 
         public ListItemViewHolder(ListItemRowBinding binding) {
             super(binding.getRoot());
+            cardView = binding.cardView;
             titleTextView = binding.title;
             lastModifiedTextView = binding.date;
         }
@@ -49,7 +56,8 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
     @Override
     public void onBindViewHolder(ListItemViewHolder holder, int position) {
-        UserList userList = mDataset.get(position);
+        UserList userList = dataSet.get(position);
+        holder.cardView.setOnClickListener(mClickListener);
         holder.titleTextView.setText(userList.title);
         holder.lastModifiedTextView.setText(
                 DateUtils.formatDateTime(holder.lastModifiedTextView.getContext(),
@@ -61,19 +69,19 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return dataSet.size();
     }
 
 
     public void addItem(UserList listItem) {
-        mDataset.add(0, listItem);
+        dataSet.add(0, listItem);
         notifyDataSetChanged();
     }
 
 
     public void setItems(List<UserList> items) {
-        mDataset.clear();
-        mDataset.addAll(items);
+        dataSet.clear();
+        dataSet.addAll(items);
         notifyDataSetChanged();
     }
 }

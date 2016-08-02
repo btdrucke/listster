@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 
@@ -26,6 +27,9 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.whizbang.listster.databinding.ActivityMainBinding;
+import com.whizbang.listster.list.UserList;
+import com.whizbang.listster.list.UserListItemAdapter;
+import com.whizbang.listster.listdetail.ListDetailActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     private static final String TAG = "Listster";
 
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDbRef;
     private boolean mToolbarCollapsed = true;
     private ActivityMainBinding mBinding;
-    private ListItemAdapter mAdapter;
+    private UserListItemAdapter mAdapter;
     private HashMap<String, String> mUserListRefs;
     private HashMap<String, UserList> mUserLists;
     private InputMethodManager mInputMethodManager;
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         LayoutManager layoutManager = new LinearLayoutManager(this);
         mBinding.recycler.setLayoutManager(layoutManager);
 
-        mAdapter = new ListItemAdapter(new ArrayList<>());
+        mAdapter = new UserListItemAdapter(new ArrayList<>(), this);
         mBinding.recycler.setAdapter(mAdapter);
     }
 
@@ -102,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void addList(String listTitle) {
-        mAdapter.addItem(new UserList(listTitle));
-        writeNewList(listTitle);
+        String key = writeNewList(listTitle);
+        mAdapter.addItem(new UserList(listTitle, key));
     }
 
 
@@ -193,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
         if (mUserListRefs != null) {
             for (String listRef : mUserListRefs.values()) {
                 UserList userList = mUserLists.get(listRef);
+                userList.key = listRef;
                 Log.d(TAG, "Got list: " + userList);
                 thisUsersLists.add(userList);
             }
@@ -201,6 +206,8 @@ public class MainActivity extends AppCompatActivity {
             // By last modified time, descending.
             return Long.compare(rhs.lastModifedUtcMillis, lhs.lastModifedUtcMillis);
         });
+
+
         mAdapter.setItems(thisUsersLists);
     }
 
@@ -220,11 +227,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void writeNewList(String title) {
+    private String writeNewList(String title) {
         DatabaseReference newList = mDbRef.child("lists").push();
         String key = newList.getKey();
-        newList.setValue(new UserList(title));
+        newList.setValue(new UserList(title, key));
         mDbRef.child("users").child(mUuid).child("lists").push().setValue(key);
+        return key;
     }
 
 
@@ -245,5 +253,13 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        int position = mBinding.recycler.getChildAdapterPosition(v);
+        String key = mAdapter.dataSet.get(position).key;
+        startActivity(ListDetailActivity.getStartIntent(this, key));
     }
 }
