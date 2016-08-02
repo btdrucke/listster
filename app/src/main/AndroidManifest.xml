@@ -20,8 +20,12 @@
         </activity>
 
         <activity
-            android:name=".GoogleSignInActivity"
-            android:label="@string/label_google_sign_in" />
+            android:label="@string/label_google_sign_in"
+            android:name=".GoogleSignInActivity"/>
+
+        <!-- TODO: Add List Title as title in actionbar -->
+        <activity android:name=".list.ListActivity"/>
+
     </application>
 
 
