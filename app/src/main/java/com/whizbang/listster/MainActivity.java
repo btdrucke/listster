@@ -29,14 +29,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.whizbang.listster.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Listster";
 
-    private FirebaseUser mUser;
     private String mDisplayName;
     private Uri mPhotoUri;
     private String mUuid;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         LayoutManager layoutManager = new LinearLayoutManager(this);
         mBinding.recycler.setLayoutManager(layoutManager);
 
-        mAdapter = new ListItemAdapter(new ArrayList<ListItemRowModel>());
+        mAdapter = new ListItemAdapter(new ArrayList<UserList>());
         mBinding.recycler.setAdapter(mAdapter);
     }
 
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void addList(String listTitle) {
-        mAdapter.addItem(new ListItemRowModel(listTitle));
+        mAdapter.addItem(new UserList(listTitle));
         writeNewList(listTitle);
     }
 
@@ -192,10 +193,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateUi() {
+        List<UserList> thisUsersLists = new ArrayList<>();
         for(String listRef : mUserListRefs.values()) {
             UserList userList = mUserLists.get(listRef);
             Log.d(TAG, "Got list: " + userList);
+            thisUsersLists.add(userList);
         }
+        mAdapter.setItems(thisUsersLists);
     }
 
 

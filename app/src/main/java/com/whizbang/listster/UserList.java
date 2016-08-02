@@ -1,31 +1,26 @@
 package com.whizbang.listster;
 
-import com.google.firebase.database.IgnoreExtraProperties;
+import android.support.annotation.Keep;
 
 
-@IgnoreExtraProperties
 public class UserList {
 
-    private String mTitle;
+    public String title;
 
 
+    @Keep
     public UserList() {}
 
 
     public UserList(String title) {
-        this.mTitle = title;
-    }
-
-
-    public String getTitle() {
-        return mTitle;
+        this.title = title;
     }
 
 
     @Override
     public String toString() {
         return "UserList{" +
-                "mTitle='" + mTitle + '\'' +
+                "mTitle='" + title + '\'' +
                 '}';
     }
 }
