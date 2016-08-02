@@ -22,8 +22,15 @@ public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.Vi
     }
 
 
-    public void addToDataSet(ListDetailItem item) {
+    public void addItem(ListDetailItem item) {
         dataSet.add(0, item);
+        notifyDataSetChanged();
+    }
+
+
+    public void setItems(List<ListDetailItem> items) {
+        dataSet.clear();
+        dataSet.addAll(items);
         notifyDataSetChanged();
     }
 
