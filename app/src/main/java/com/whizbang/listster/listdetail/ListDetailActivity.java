@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -13,6 +16,8 @@ import com.whizbang.listster.R;
 
 
 public class ListDetailActivity extends AppCompatActivity {
+
+    private static final String TAG = "Listster";
 
     private final static String EXTRA_LIST_KEY = "extra_list_key";
     private RecyclerView mRecyclerView;
@@ -60,5 +65,23 @@ public class ListDetailActivity extends AppCompatActivity {
 
     private void addItem(ListDetailItem item) {
         mAdapter.addToDataSet(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.activity_list_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_share:
+                Log.d(TAG, "share");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
