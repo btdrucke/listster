@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.whizbang.listster.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Log.d(TAG, "Instance token: " + token);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final Toolbar toolbar = mBinding.toolbar;
