@@ -240,7 +240,9 @@ public class MainActivity extends AppCompatActivity
                     if (listRef.equals(mRequestedListRef)) {
                         Log.d(TAG, "Going to list detail");
                         mRequestedListRef = null;
-                        startActivity(ListDetailActivity.getStartIntent(this, listRef));
+                        startActivity(
+                                ListDetailActivity.getStartIntent(this, mDisplayName, mPhotoUri,
+                                        userList.title, listRef));
                     }
                 }
             }
@@ -351,8 +353,11 @@ public class MainActivity extends AppCompatActivity
             unselectView(v);
         } else {
             int position = mBinding.recycler.getChildAdapterPosition(v);
-            String key = mAdapter.dataSet.get(position).key;
-            startActivity(ListDetailActivity.getStartIntent(this, key));
+            UserList userList = mAdapter.dataSet.get(position);
+            String key = userList.key;
+            startActivity(
+                    ListDetailActivity.getStartIntent(this, mDisplayName, mPhotoUri, userList.title,
+                            key));
         }
     }
 
