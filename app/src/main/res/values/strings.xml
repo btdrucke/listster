@@ -15,9 +15,9 @@
     <string name="description">Description</string>
     <string name="menu_logout">Logout</string>
     <string name="menu_link_test">Test link</string>
-<<<<<<< e7a571a5aa878c2093e58445444f73fcdbf40a3e
-    <string name="menu_share">Share</string>
-=======
-    <string name="delete">delete</string>
->>>>>>> delete working
+    <string name="menu_share">Invite</string>
+    <string name="delete">Delete</string>
+    <string name="invitation_title">You\'ve been invited to Listster!</string>
+    <string name="invitation_message">%1$s has invited you to view list \"%2$s\"</string>
+    <string name="invitation_cta">View</string>
 </resources>
