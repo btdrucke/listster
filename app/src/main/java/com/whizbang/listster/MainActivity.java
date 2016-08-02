@@ -209,6 +209,9 @@ public class MainActivity extends AppCompatActivity
         GenericTypeIndicator<HashMap<String, String>> t = new GenericTypeIndicator<HashMap<String, String>>() {
         };
         mUserListRefs = dataSnapshot.getValue(t);
+        if (mUserListRefs == null) {
+            mUserListRefs = new HashMap<>();
+        }
         if (mUserLists != null) {
             updateUi();
         }
@@ -219,6 +222,9 @@ public class MainActivity extends AppCompatActivity
         GenericTypeIndicator<HashMap<String, UserList>> t = new GenericTypeIndicator<HashMap<String, UserList>>() {
         };
         mUserLists = dataSnapshot.getValue(t);
+        if (mUserLists == null) {
+            mUserLists = new HashMap<>();
+        }
         if (mUserListRefs != null) {
             updateUi();
         }
@@ -323,6 +329,10 @@ public class MainActivity extends AppCompatActivity
     private void processIntent(Intent intent) {
         Uri data = intent.getData();
         if (data != null) {
+            String link = data.getQueryParameter("link");
+            if (link != null) {
+                data = Uri.parse(link);
+            }
             mInviteListRef = data.getQueryParameter("invite");
             mListRefToShow = data.getQueryParameter("list");
         }
@@ -339,7 +349,7 @@ public class MainActivity extends AppCompatActivity
                 Uri link = Uri.parse("https://g5xnr.app.goo.gl/?apn=com.whizbang.listster")
                         .buildUpon()
                         .appendQueryParameter("link",
-                                "https://listster?invite=-KO8jHZw2TTSm7H_Qtad")
+                                "https://listster?invite=-KOBBCp0W4tQXbav6Eq4")
                         .build();
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
