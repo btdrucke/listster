@@ -1,9 +1,11 @@
 package com.whizbang.listster;
 
+import android.app.ListActivity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView.LayoutManager;
@@ -16,6 +18,11 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -37,7 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements OnClickListener {
+public class MainActivity extends AppCompatActivity
+        implements OnClickListener, OnConnectionFailedListener {
 
     private static final String TAG = "Listster";
 
@@ -51,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private HashMap<String, String> mUserListRefs;
     private HashMap<String, UserList> mUserLists;
     private InputMethodManager mInputMethodManager;
+    private GoogleApiClient mGoogleApiClient;
+    private String mRequestedListRef;
 
 
     @Override
@@ -59,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Instance token: " + token);
+
+        processIntent(getIntent());
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final Toolbar toolbar = mBinding.toolbar;
@@ -92,6 +104,24 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         mAdapter = new UserListItemAdapter(new ArrayList<>(), this);
         mBinding.recycler.setAdapter(mAdapter);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, this)
+                .addApi(AppInvite.API)
+                .build();
+
+        boolean autoLaunchDeepLink = false;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+                .setResultCallback(result -> {
+                    if (result.getStatus().isSuccess()) {
+                        // Extract deep link from Intent
+                        Intent intent = result.getInvitationIntent();
+                        String deepLink = AppInviteReferral.getDeepLink(intent);
+
+                        Log.d(TAG, deepLink);
+                    } else {
+                        Log.d(TAG, "getInvitation: no deep link found.");
+                    }
+                });
     }
 
 
@@ -200,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 userList.key = listRef;
                 Log.d(TAG, "Got list: " + userList);
                 thisUsersLists.add(userList);
+                if (listRef.equals(mRequestedListRef)) {
+                    startActivity(ListDetailActivity.getStartIntent(this, listRef));
+                }
             }
         }
         Collections.sort(thisUsersLists, (lhs, rhs) -> {
@@ -245,11 +278,32 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        processIntent(intent);
+    }
+
+
+    private void processIntent(Intent intent) {
+        Uri data = intent.getData();
+        if (data != null) {
+            mRequestedListRef = data.getQueryParameter("list");
+            Log.d(TAG, "Requested list ref: " + mRequestedListRef);
+        }
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_logout:
                 GoogleSignInActivity.signOutFromApp(this);
                 return true;
+            case R.id.menu_item_link_test:
+                Uri link = Uri.parse("listster://link/?list=123ABC");
+                Intent intent = new Intent(Intent.ACTION_VIEW, link);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -261,5 +315,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         int position = mBinding.recycler.getChildAdapterPosition(v);
         String key = mAdapter.dataSet.get(position).key;
         startActivity(ListDetailActivity.getStartIntent(this, key));
+    }
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.w(TAG, "Connection error: " + connectionResult.getErrorMessage());
     }
 }
