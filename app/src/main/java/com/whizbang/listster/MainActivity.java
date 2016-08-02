@@ -128,6 +128,6 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference newList = mDbRef.child("lists").push();
         String key = newList.getKey();
         newList.setValue(new UserList(title));
-        mDbRef.child("users").child("lists").push().setValue(key);
+        mDbRef.child("users").child(mUuid).child("lists").push().setValue(key);
     }
 }
