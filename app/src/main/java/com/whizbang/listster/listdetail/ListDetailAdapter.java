@@ -1,4 +1,4 @@
-package com.whizbang.listster.list;
+package com.whizbang.listster.listdetail;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,39 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
+public class ListDetailAdapter extends RecyclerView.Adapter<ListDetailAdapter.ViewHolder> {
 
-    List<Item> mDataSet;
+    public List<ListDetailItem> dataSet;
 
 
-    public ListAdapter() {
-        mDataSet = new ArrayList<>();
+    public ListDetailAdapter() {
+        dataSet = new ArrayList<>();
     }
 
 
-    public void addToDataSet(Item item) {
-        mDataSet.add(0, item);
+    public void addToDataSet(ListDetailItem item) {
+        dataSet.add(0, item);
         notifyDataSetChanged();
     }
 
 
-    public ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListDetailAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(itemView);
-        return viewHolder;
+        return new ViewHolder(itemView);
     }
 
 
     @Override
     public int getItemCount() {
-        return mDataSet.size();
+        return dataSet.size();
     }
 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Item item = mDataSet.get(position);
+        ListDetailItem item = dataSet.get(position);
         TextView title = holder.title;
         title.setText(item.title);
         TextView author = holder.author;

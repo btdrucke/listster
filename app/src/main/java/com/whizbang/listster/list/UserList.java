@@ -1,4 +1,4 @@
-package com.whizbang.listster;
+package com.whizbang.listster.list;
 
 import android.support.annotation.Keep;
 
@@ -7,17 +7,19 @@ public class UserList {
 
     public String title;
     public long lastModifedUtcMillis;
+    public String key;
 
 
     @Keep
     public UserList() {
-        this(null);
+        this(null, null);
     }
 
 
-    public UserList(String title) {
+    public UserList(String title, String key) {
         this.title = title;
         this.lastModifedUtcMillis = System.currentTimeMillis();
+        this.key = key;
     }
 
 
