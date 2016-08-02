@@ -10,15 +10,16 @@ import com.whizbang.listster.ListItemAdapter.ListItemViewHolder;
 import com.whizbang.listster.databinding.ListItemRowBinding;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
 
 
-    private ArrayList<ListItemRowModel> mDataset;
+    private ArrayList<UserList> mDataset;
 
 
-    public ListItemAdapter(ArrayList<ListItemRowModel> data) {
+    public ListItemAdapter(ArrayList<UserList> data) {
         mDataset = data;
     }
 
@@ -55,8 +56,15 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemViewHolder> {
     }
 
 
-    public void addItem(ListItemRowModel listItem) {
+    public void addItem(UserList listItem) {
         mDataset.add(0, listItem);
+        notifyDataSetChanged();
+    }
+
+
+    public void setItems(List<UserList> items) {
+        mDataset.clear();
+        mDataset.addAll(items);
         notifyDataSetChanged();
     }
 }
