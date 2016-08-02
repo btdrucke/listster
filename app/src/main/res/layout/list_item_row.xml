@@ -1,5 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
@@ -7,15 +8,29 @@
         android:layout_width="match_parent"
         app:cardCornerRadius="2dp">
 
-        <TextView
-            android:id="@+id/title"
-            android:gravity="center_vertical"
+        <LinearLayout
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:padding="16dp"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"/>
+            android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/title"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                tools:text="My list title"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                tools:text="March 3rd, 10:32 AM"/>
+        </LinearLayout>
     </android.support.v7.widget.CardView>
 
 </layout>
