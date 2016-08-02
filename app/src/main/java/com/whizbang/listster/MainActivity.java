@@ -9,13 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,7 +26,6 @@ import com.whizbang.listster.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,38 +56,32 @@ public class MainActivity extends AppCompatActivity {
         mBinding.appbar.setExpanded(false);
         setSupportActionBar(toolbar);
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        mBinding.fab.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBinding.appbar.setExpanded(true);
-                mBinding.titleEditText.setFocusable(true);
-                mBinding.titleEditText.requestFocus();
-                mToolbarCollapsed = false;
-                showKeyboard();
-            }
+        mBinding.fab.setOnClickListener(v -> {
+            mBinding.appbar.setExpanded(true);
+            mBinding.titleEditText.setFocusable(true);
+            mBinding.titleEditText.requestFocus();
+            mToolbarCollapsed = false;
+            showKeyboard();
         });
 
-        mBinding.titleEditText.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    addList(v.getText().toString());
-                    handled = true;
-                    mBinding.titleEditText.setText("");
-                    hideKeyboard(v);
-                    mBinding.getRoot().requestFocus();
-                    mBinding.appbar.setExpanded(false);
-                    mToolbarCollapsed = true;
-                }
-                return handled;
+        mBinding.titleEditText.setOnEditorActionListener((v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                addList(v.getText().toString());
+                handled = true;
+                mBinding.titleEditText.setText("");
+                hideKeyboard(v);
+                mBinding.getRoot().requestFocus();
+                mBinding.appbar.setExpanded(false);
+                mToolbarCollapsed = true;
             }
+            return handled;
         });
         mBinding.recycler.setHasFixedSize(true);
         LayoutManager layoutManager = new LinearLayoutManager(this);
         mBinding.recycler.setLayoutManager(layoutManager);
 
-        mAdapter = new ListItemAdapter(new ArrayList<UserList>());
+        mAdapter = new ListItemAdapter(new ArrayList<>());
         mBinding.recycler.setAdapter(mAdapter);
     }
 
@@ -200,12 +189,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Got list: " + userList);
             thisUsersLists.add(userList);
         }
-        Collections.sort(thisUsersLists, new Comparator<UserList>() {
-            @Override
-            public int compare(UserList lhs, UserList rhs) {
-                // By last modified time, descending.
-                return Long.compare(rhs.lastModifedUtcMillis, lhs.lastModifedUtcMillis);
-            }
+        Collections.sort(thisUsersLists, (lhs, rhs) -> {
+            // By last modified time, descending.
+            return Long.compare(rhs.lastModifedUtcMillis, lhs.lastModifedUtcMillis);
         });
         mAdapter.setItems(thisUsersLists);
     }

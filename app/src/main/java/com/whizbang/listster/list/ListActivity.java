@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -50,14 +48,11 @@ public class ListActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         if (addButton != null) {
-            addButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String title = newTask.getText().toString();
-                    String author = mDisplayName;
-                    addItem(new Item(title, author, false));
-                    newTask.setText("");
-                }
+            addButton.setOnClickListener(v -> {
+                String title = newTask.getText().toString();
+                String author = mDisplayName;
+                addItem(new Item(title, author, false));
+                newTask.setText("");
             });
         }
     }
