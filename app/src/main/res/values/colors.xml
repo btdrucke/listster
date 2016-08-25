@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Theme -->
     <color name="colorPrimary">#ffffff</color>
     <color name="colorPrimaryDark">#111111</color>
     <color name="colorAccent">#D5FF44</color>
+
+    <!-- App Theme 2-->
+    <color name="colorPrimary2">#ffffff</color>
+    <color name="colorPrimaryDark2">#388E3C</color>
+    <color name="colorAccent2">#9E9E9E</color>
 
     <color name="text_secondary">#888</color>
     <color name="grey_100">#F5F5F5</color>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>theme_change</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>show_avatar</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>override_avatar</key>
+        <value>false</value>
+    </entry>
+</defaultsMap>

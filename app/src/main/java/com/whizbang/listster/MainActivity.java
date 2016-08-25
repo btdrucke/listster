@@ -2,10 +2,13 @@ package com.whizbang.listster;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,12 +22,18 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -35,6 +44,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.whizbang.listster.databinding.ActivityMainBinding;
 import com.whizbang.listster.list.UserList;
 import com.whizbang.listster.list.UserListItemAdapter;
@@ -50,7 +61,10 @@ public class MainActivity extends AppCompatActivity
         implements OnClickListener, OnConnectionFailedListener, OnLongClickListener {
 
     private static final String TAG = "Listster";
-
+    private static final String THEME_CHANGE_KEY = "theme_change";
+    private static final String SHOW_AVATAR_KEY = "show_avatar";
+    private static final String OVERRIDE_AVATAR_KEY = "override_avatar";
+    FirebaseRemoteConfig mFirebaseRemoteConfig;
     private String mDisplayName;
     private Uri mPhotoUri;
     private String mUuid;
@@ -76,6 +90,15 @@ public class MainActivity extends AppCompatActivity
 
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Instance token: " + token);
+
+        //Get Remote Config Values
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(
+                BuildConfig.DEBUG).build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+
+
 
         if (savedInstanceState == null) {
             processIntent(getIntent());
@@ -169,7 +192,24 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, GoogleSignInActivity.class));
         } else {
             getUserData(user);
+            //Set Title of Action Bar
             mBinding.toolbarTitle.setText(getString(R.string.users_lists, mDisplayName));
+
+            //Set Image of Action Bar
+            ImageView imageView = mBinding.toolbarAvatar;
+            Glide.with(MainActivity.this)
+                    .load(mPhotoUri)
+                    .asBitmap()
+                    .centerCrop()
+                    .into(new BitmapImageViewTarget(imageView) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory
+                                    .create(getApplicationContext().getResources(), resource);
+                            circularBitmapDrawable.setCircular(true);
+                            imageView.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             mDbRef = database.getReference();
@@ -201,6 +241,45 @@ public class MainActivity extends AppCompatActivity
                     MainActivity.this.onCancelled(error);
                 }
             });
+
+            long cacheExpiration = 3600; // 1 hour in seconds.
+            if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+                cacheExpiration = 0;
+            }
+            mFirebaseRemoteConfig.fetch(cacheExpiration)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(MainActivity.this, "Fetch Succeeded",
+                                        Toast.LENGTH_SHORT).show();
+                                mFirebaseRemoteConfig.activateFetched();
+                            } else {
+                                Toast.makeText(MainActivity.this, "Fetch Failed",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            updateRemoteConfigValues();
+                        }
+                    });
+        }
+    }
+
+
+    private void updateRemoteConfigValues() {
+        //Change Colors
+        boolean themeChange = mFirebaseRemoteConfig.getBoolean(THEME_CHANGE_KEY);
+        setTheme(themeChange ? R.style.AppTheme2 : R.style.AppTheme);
+
+        //Show Avatar
+        boolean showAvatar = mFirebaseRemoteConfig.getBoolean(SHOW_AVATAR_KEY);
+        mBinding.toolbarAvatar.setVisibility(showAvatar ? View.VISIBLE : View.GONE);
+
+        //Override Avatar
+        boolean overrideAvatar = mFirebaseRemoteConfig.getBoolean(OVERRIDE_AVATAR_KEY);
+        if (overrideAvatar) {
+            //Set Eric as override avatar
+            mBinding.toolbarAvatar.setImageDrawable(
+                    getApplicationContext().getDrawable(R.drawable.ic_logout));
         }
     }
 
